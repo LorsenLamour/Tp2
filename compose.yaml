@@ -1,23 +1,41 @@
 services:
   backend:
-      image: cmvstudent/movies-backend:v3
+      image: cmvstudent/movies-backend:v1
       build:
-        context: ./backend
+        context: ./movies-backend
       ports:
         - "8787:8787"
       networks:
         - my-network
 
+  mongodb:
+    image: mongo:8.0.6
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+    networks:
+      - my-network
+    volumes:
+      - db:/data/db
+      - ./movies-backend/mongo-seed:/docker-entrypoint-initdb.d
+ 
+
+
   frontend:
-      image: cmvstudent/movies-frontend:v3
+      image: cmvstudent/movies-frontend:v1
       build:
-        context: ./frontend
+        context: ./movies-frontend
       ports:
         - "80:80"
       depends_on:
         - backend
       networks:
         - my-network
+
+volumes:
+  db:
 
 networks:
   my-network:
